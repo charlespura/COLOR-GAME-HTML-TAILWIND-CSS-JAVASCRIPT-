@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Game</title>
+  <!-- Tailwind CSS CDN -->
+  
+  <!-------- CREATED BY CHARLES PURA--------></!-------->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans text-center py-8">
+  <div class="max-w-3xl mx-auto p-6 bg-white shadow-xl rounded-lg">
+    <h1 class="text-3xl font-bold mb-4">Color Game</h1>
+    <p class="text-xl mb-2">Money: <span id="money" class="font-semibold">100</span> pesos</p>
+    <p class="text-lg mb-4">Bet Amount: <input type="number" id="bet-amount" class="border p-2 rounded-md w-20" min="1" value="10"></p>
+    
+    <div id="buttons" class="mb-6"></div>
+
+    <div class="flex justify-center gap-6 mb-6">
+      <div class="w-24 h-24 border-2 border-black flex items-center justify-center bg-gray-400 text-white text-xl font-bold" id="dice1"></div>
+      <div class="w-24 h-24 border-2 border-black flex items-center justify-center bg-gray-400 text-white text-xl font-bold" id="dice2"></div>
+    </div>
+
+    <p id="result" class="text-lg font-semibold mb-4"></p>
+
+    <button onclick="resetGame()" class="bg-blue-500 text-white py-2 px-6 rounded-md text-lg hover:bg-blue-600">Reset Game</button>
+  </div>
+
+  <footer class="mt-8 text-center text-sm">
+    <p>Created by <a href="https://github.com/charlespura" class="text-blue-500 hover:underline">@charlespura</a></p>
+    <p>Connect with me on <a href="https://linkedin.com/in/charlespura" class="text-blue-500 hover:underline">LinkedIn</a></p>
+  </footer>
+
+  <script>
+    const colors = ['yellow', 'orange', 'red', 'blue', 'green', 'pink'];
+    let money = 100;
+    const moneyDisplay = document.getElementById('money');
+    const buttonsContainer = document.getElementById('buttons');
+    const dice1 = document.getElementById('dice1');
+    const dice2 = document.getElementById('dice2');
+    const resultDisplay = document.getElementById('result');
+    const betInput = document.getElementById('bet-amount');
+    let dice1Color, dice2Color, selectedColor, betAmount;
+
+    function setupGame() {
+      buttonsContainer.innerHTML = '';
+      resultDisplay.textContent = '';
+      dice1.style.backgroundColor = 'none';
+      dice2.style.backgroundColor = 'none';
+      dice1.textContent = '';
+      dice2.textContent = '';
+//Developer : CHARLES PURA
+      // Generate color buttons
+      colors.forEach((color) => {
+        const button = document.createElement('button');
+        button.classList.add(
+          'inline-block',
+          'w-24',
+          'h-24',
+          'm-2',
+          'border-none',
+          'cursor-pointer',
+          'rounded-md',
+          'transition-transform',
+          'duration-180',
+          'hover:scale-150',
+          'active:scale-110',
+          'shadow-lg',
+          'hover:shadow-xl'
+        );
+        button.style.backgroundColor = color;
+        button.onclick = () => handleGuess(color);
+        buttonsContainer.appendChild(button);
+      });
+    }
+
+    function rollDice() {
+      dice1Color = colors[Math.floor(Math.random() * colors.length)];
+      dice2Color = colors[Math.floor(Math.random() * colors.length)];
+
+      let rollCount = 0;
+      const duration = 2000; 
+      const intervalSpeed = 70; 
+      const totalRolls = duration / intervalSpeed;
+
+      const interval = setInterval(() => {
+        dice1.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        dice2.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        rollCount++;
+
+        if (rollCount >= totalRolls) {
+          clearInterval(interval);
+          dice1.style.backgroundColor = dice1Color;
+          dice2.style.backgroundColor = dice2Color;
+
+          setTimeout(() => {
+            if (selectedColor === dice1Color || selectedColor === dice2Color) {
+              money += betAmount * 2;
+              resultDisplay.textContent = `Correct! You won ${betAmount * 2} pesos!`;
+            } else {
+              money -= betAmount;
+              resultDisplay.textContent = `Wrong! You lost ${betAmount} pesos.`;
+            }
+            moneyDisplay.textContent = money;
+
+            if (money <= 0) {
+              resultDisplay.textContent = 'Game Over! You ran out of money.';
+            } else {
+              setupGame();
+            }
+          }, 300);
+        }
+      }, intervalSpeed);
+    }
+// Developer : Charles Pura
+    function handleGuess(guess) {
+      selectedColor = guess;
+      betAmount = parseInt(betInput.value);
+
+      if (betAmount > money || betAmount <= 0) {
+        resultDisplay.textContent = 'Invalid bet amount!';
+        return;
+      }
+
+      rollDice();
+    }
+
+    function resetGame() {
+      money = 100;
+      moneyDisplay.textContent = money;
+      betInput.value = 10;
+      setupGame();
+    }
+
+    setupGame();
+  </script>
+</body>
+</html>
